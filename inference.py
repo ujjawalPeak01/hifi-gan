@@ -34,21 +34,21 @@ def scan_checkpoint(cp_dir, prefix):
     return sorted(cp_list)[-1]
 
 
-def inference(a):
+def inference(checkpoint_file, input_wavs_dir, output_dir):
     generator = Generator(h).to(device)
 
-    state_dict_g = load_checkpoint(a.checkpoint_file, device)
+    state_dict_g = load_checkpoint(checkpoint_file, device)
     generator.load_state_dict(state_dict_g['generator'])
 
-    filelist = os.listdir(a.input_wavs_dir)
+    filelist = os.listdir(input_wavs_dir)
 
-    os.makedirs(a.output_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     generator.eval()
     generator.remove_weight_norm()
     with torch.no_grad():
         for i, filname in enumerate(filelist):
-            wav, sr = load_wav(os.path.join(a.input_wavs_dir, filname))
+            wav, sr = load_wav(os.path.join(input_wavs_dir, filname))
             wav = wav / MAX_WAV_VALUE
             wav = torch.FloatTensor(wav).to(device)
             x = get_mel(wav.unsqueeze(0))
@@ -57,21 +57,14 @@ def inference(a):
             audio = audio * MAX_WAV_VALUE
             audio = audio.cpu().numpy().astype('int16')
 
-            output_file = os.path.join(a.output_dir, os.path.splitext(filname)[0] + '_generated.wav')
+            output_file = os.path.join(output_dir, os.path.splitext(filname)[0] + '_generated.wav')
             write(output_file, h.sampling_rate, audio)
             print(output_file)
 
-
-def main():
+def initialize_helper(checkpoint_file, input_wavs_dir='test_files', output_dir='generated_files'):
     print('Initializing Inference Process..')
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--input_wavs_dir', default='test_files')
-    parser.add_argument('--output_dir', default='generated_files')
-    parser.add_argument('--checkpoint_file', required=True)
-    a = parser.parse_args()
-
-    config_file = os.path.join(os.path.split(a.checkpoint_file)[0], 'config.json')
+    config_file = os.path.join(os.path.split(checkpoint_file)[0], 'config.json')
     with open(config_file) as f:
         data = f.read()
 
@@ -87,11 +80,10 @@ def main():
     else:
         device = torch.device('cpu')
 
-    inference(a)
-
 
 if __name__ == '__main__':
-    main()
+    initialize_helper('generator_v3')
+    inference('generator_v3', 'test_files', 'generated_files')
     import time
     time.sleep(50)
 
