@@ -73,13 +73,13 @@ def initialize_helper(
 
     config_file = os.path.join(os.path.split(checkpoint_file)[0], "config.json")
     print("The String: " + str(os.path.abspath(checkpoint_file)))
-    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    __parent_location__ = os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__), "..")
-    )
+    # __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    # __parent_location__ = os.path.realpath(
+    #     os.path.join(os.getcwd(), os.path.dirname(__file__), "..")
+    # )
 
-    print("LOCATION: " + str(__location__))
-    print("PARENT LOCATION: " + str(__parent_location__))
+    # print("LOCATION: " + str(__location__))
+    # print("PARENT LOCATION: " + str(__parent_location__))
     with open(config_file) as f:
         data = f.read()
 
