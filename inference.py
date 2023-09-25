@@ -36,34 +36,25 @@ def scan_checkpoint(cp_dir, prefix):
     return sorted(cp_list)[-1]
 
 
-def inference(checkpoint_file, input_wavs_dir, output_dir):
+def inference(checkpoint_file, input_file):
     generator = Generator(h).to(device)
 
     state_dict_g = load_checkpoint(checkpoint_file, device)
     generator.load_state_dict(state_dict_g["generator"])
 
-    filelist = os.listdir(input_wavs_dir)
-
-    os.makedirs(output_dir, exist_ok=True)
-
     generator.eval()
     generator.remove_weight_norm()
     with torch.no_grad():
-        for i, filname in enumerate(filelist):
-            wav, sr = load_wav(os.path.join(input_wavs_dir, filname))
-            wav = wav / MAX_WAV_VALUE
-            wav = torch.FloatTensor(wav).to(device)
-            x = get_mel(wav.unsqueeze(0))
-            y_g_hat = generator(x)
-            audio = y_g_hat.squeeze()
-            audio = audio * MAX_WAV_VALUE
-            audio = audio.cpu().numpy().astype("int16")
+        wav, sr = load_wav(input_file)
+        wav = wav / MAX_WAV_VALUE
+        wav = torch.FloatTensor(wav).to(device)
+        x = get_mel(wav.unsqueeze(0))
+        y_g_hat = generator(x)
+        audio = y_g_hat.squeeze()
+        audio = audio * MAX_WAV_VALUE
+        audio = audio.cpu().numpy().astype("int16")
+        return audio, sr
 
-            output_file = os.path.join(
-                output_dir, os.path.splitext(filname)[0] + "_generated.wav"
-            )
-            write(output_file, h.sampling_rate, audio)
-            print(output_file)
 
 
 def initialize_helper(
@@ -72,14 +63,7 @@ def initialize_helper(
     print("Initializing Inference Process..")
 
     config_file = os.path.join(os.path.split(checkpoint_file)[0], "config.json")
-    print("The String: " + str(os.path.abspath(checkpoint_file)))
-    # __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    # __parent_location__ = os.path.realpath(
-    #     os.path.join(os.getcwd(), os.path.dirname(__file__), "..")
-    # )
 
-    # print("LOCATION: " + str(__location__))
-    # print("PARENT LOCATION: " + str(__parent_location__))
     with open(config_file) as f:
         data = f.read()
 
