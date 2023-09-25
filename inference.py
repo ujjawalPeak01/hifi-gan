@@ -90,4 +90,4 @@ def initialize_helper(
 
 
 if __name__ == "__main__":
-    initialize_helper("model_weights/generator_v3")
+    initialize_helper("generator_v3")

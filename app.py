@@ -8,7 +8,7 @@ from inference import initialize_helper, inference
 
 class InferlessPythonModel:
     def initialize(self):
-        initialize_helper("model_weights/generator_v3")
+        initialize_helper("generator_v3")
 
     def dowload_wav_file(self, audio_url):
         file_name = audio_url.split("/")[-1]
@@ -27,7 +27,7 @@ class InferlessPythonModel:
         audio_url = inputs["audio_url"]
         self.dowload_wav_file(audio_url)
 
-        inference("model_weights/generator_v3", "test_files", "generated_files")
+        inference("generator_v3", "test_files", "generated_files")
 
         file_name = audio_url.split("/")[-1]
         file_path = "generated_files/" + file_name.split(".")[0] + "_generated.wav"
