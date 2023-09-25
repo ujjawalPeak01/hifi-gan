@@ -42,9 +42,3 @@ class InferlessPythonModel:
 
     def finalize():
         pass
-
-model = InferlessPythonModel()
-model.initialize()
-model.infer({
-    "audio_url": "https://infer-global-models.s3.amazonaws.com/ujjawal/ss_gt_1.wav"
-})
