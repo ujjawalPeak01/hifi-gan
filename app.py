@@ -15,35 +15,36 @@ class InferlessPythonModel:
         initialize_helper(os.path.join(self.location, self.model_weights_file_name))
 
     def dowload_wav_file(self, audio_url):
-        file_name = audio_url.split("/")[-1]
-        save_path = os.path.join(self.location, file_name)
         response = requests.get(audio_url)
         if response.status_code == 200:
-            with open(save_path, "wb") as f:
-                f.write(response.content)
-            print(f"File downloaded successfully and saved to {save_path}")
+            audio_data = BytesIO(response.content)
+            print("File downloaded successfully and kept in memory.")
         else:
-            print(
-                f"Failed to download the file. HTTP Status Code: {response.status_code}"
-            )
+            print(f"Failed to download the file. HTTP Status Code: {response.status_code}")
+        return audio_data
 
     def infer(self, inputs):
         audio_url = inputs["audio_url"]
-        self.dowload_wav_file(audio_url)
-        file_name = audio_url.split("/")[-1]
+        audio_data = self.dowload_wav_file(audio_url)
 
         result, sr = inference(
             os.path.join(self.location, self.model_weights_file_name),
-            os.path.join(self.location, file_name),
+            audio_data,
         )
-
 
         buffer = BytesIO()
         sf.write(buffer, result, sr, format='WAV')
         buffer.seek(0)
 
         base64_audio = base64.b64encode(buffer.read()).decode('utf-8')
+        print(base64_audio)
         return {"generated_base_64": base64_audio}
 
     def finalize():
         pass
+
+model = InferlessPythonModel()
+model.initialize()
+model.infer({
+    "audio_url": "https://infer-global-models.s3.amazonaws.com/ujjawal/ss_gt_1.wav"
+})
