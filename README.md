@@ -1,105 +1,117 @@
 # HiFi-GAN: Generative Adversarial Networks for Efficient and High Fidelity Speech Synthesis
 
-### Jungil Kong, Jaehyeon Kim, Jaekyoung Bae
+HiFi-GAN is a TTS Vocoder capable of generating high fidelity speech efficiently. You can use the following template to import this on Inferless.
 
-In our [paper](https://arxiv.org/abs/2010.05646), 
-we proposed HiFi-GAN: a GAN-based model capable of generating high fidelity speech efficiently.<br/>
-We provide our implementation and pretrained models as open source in this repository.
-
-**Abstract :**
-Several recent work on speech synthesis have employed generative adversarial networks (GANs) to produce raw waveforms. 
-Although such methods improve the sampling efficiency and memory usage, 
-their sample quality has not yet reached that of autoregressive and flow-based generative models. 
-In this work, we propose HiFi-GAN, which achieves both efficient and high-fidelity speech synthesis. 
-As speech audio consists of sinusoidal signals with various periods, 
-we demonstrate that modeling periodic patterns of an audio is crucial for enhancing sample quality. 
-A subjective human evaluation (mean opinion score, MOS) of a single speaker dataset indicates that our proposed method 
-demonstrates similarity to human quality while generating 22.05 kHz high-fidelity audio 167.9 times faster than 
-real-time on a single V100 GPU. We further show the generality of HiFi-GAN to the mel-spectrogram inversion of unseen 
-speakers and end-to-end speech synthesis. Finally, a small footprint version of HiFi-GAN generates samples 13.4 times 
-faster than real-time on CPU with comparable quality to an autoregressive counterpart.
-
-Visit our [demo website](https://jik876.github.io/hifi-gan-demo/) for audio samples.
+---
+## Prerequisites
+- **Git**. You would need git installed on your system if you wish to customize the repo after forking.
+- **Python>=3.8**. You would need Python to customize the code in the app.py according to your needs.
+- **Curl**. You would need Curl if you want to make API calls from the terminal itself.
 
 
-## Pre-requisites
-1. Python >= 3.6
-2. Clone this repository.
-3. Install python requirements. Please refer [requirements.txt](requirements.txt)
-4. Download and extract the [LJ Speech dataset](https://keithito.com/LJ-Speech-Dataset/).
-And move all wav files to `LJSpeech-1.1/wavs`
+---
+## Quick Start
+Here is a quick start to help you get up and running with this template on Inferless.
 
+### Fork the Repository
+Get started by forking the repository. You can do this by clicking on the fork button in the top right corner of the repository page.
 
-## Training
+This will create a copy of the repository in your own GitHub account, allowing you to make changes and customize it according to your needs.
+
+### Custom Model Weights (optional)
+There are a lot of pretrained model weights which you can provide. Some of them are given [here](https://drive.google.com/drive/folders/1-eEYTB5Av9jNql0WGBlRoi-WH2J7bp5Y).
+
+After downloading the `config.json` and the model weights, replace the `config.json` and the `generator_v3` from the repo. Go into the `app.py` file and change the variable named as `model_weights_file_name` to the name of your model weights file.
+
+### Create a Custom Runtime in Inferless
+To access the custom runtime window in Inferless, simply navigate to the sidebar and click on the **Create new Runtime** button. A pop-up will appear.
+
+Next, provide a suitable name for your custom runtime and proceed by uploading the `config.yaml` file mentioned above. Finally, ensure you save your changes by clicking on the save button.
+
+### Import the Model in Inferless
+Log in to your inferless account, select the workspace you want the model to be imported into and click the Add Model button.
+
+Select the **PyTorch** as framework and choose **Repo(custom code)** as your model source and use the forked repo URL as the **Model URL**.
+
+After the create model step, while setting the configuration for the model make sure to select the appropriate runtime.
+
+Enter all the required details to Import your model. Refer [this link](https://docs.inferless.com/integrations/github-custom-code) for more information on model import.
+
+The following is a sample Input and Output JSON for this model which you can use while importing this model on Inferless.
+
+### Input
+```json
+{
+  "inputs": [
+    {
+      "data": [
+        "https://infer-global-models.s3.amazonaws.com/ujjawal/ss_gt_1.wav"
+      ],
+      "name": "audio_url",
+      "shape": [
+        1
+      ],
+      "datatype": "BYTES"
+    }
+  ]
+}
 ```
-python train.py --config config_v1.json
+
+### Output
+```json
+{
+  "outputs": [
+    {
+      "data": [
+        "Once upon a time the sun was up he would look down to the valley below and wonder wis"
+      ],
+      "name": "generated_text",
+      "shape": [
+        1
+      ],
+      "datatype": "BYTES"
+    }
+  ]
+}
 ```
-To train V2 or V3 Generator, replace `config_v1.json` with `config_v2.json` or `config_v3.json`.<br>
-Checkpoints and copy of the configuration file are saved in `cp_hifigan` directory by default.<br>
-You can change the path by adding `--checkpoint_path` option.
+---
+## Curl Command
+Following is an example of the curl command you can use to make inference. You can find the exact curl command in the Model's API page in Inferless.
 
-Validation loss during training with V1 generator.<br>
-![validation loss](./validation_loss.png)
+```bash
+curl --location '<your_inference_url>' \
+          --header 'Content-Type: application/json' \
+          --header 'Authorization: Bearer <your_api_key>' \
+          --data '{
+              "inputs": [
+                {
+                  "data": [
+                    "Once upon a time"
+                  ],
+                  "name": "prompt",
+                  "shape": [
+                    1
+                  ],
+                  "datatype": "BYTES"
+                }
+              ]
+            }'
+```
 
-## Pretrained Model
-You can also use pretrained models we provide.<br/>
-[Download pretrained models](https://drive.google.com/drive/folders/1-eEYTB5Av9jNql0WGBlRoi-WH2J7bp5Y?usp=sharing)<br/> 
-Details of each folder are as in follows:
+---
+## Customizing the Code
+Open the `app.py` file. This contains the main code for inference. It has three main functions, initialize, infer and finalize.
 
-|Folder Name|Generator|Dataset|Fine-Tuned|
-|------|---|---|---|
-|LJ_V1|V1|LJSpeech|No|
-|LJ_V2|V2|LJSpeech|No|
-|LJ_V3|V3|LJSpeech|No|
-|LJ_FT_T2_V1|V1|LJSpeech|Yes ([Tacotron2](https://github.com/NVIDIA/tacotron2))|
-|LJ_FT_T2_V2|V2|LJSpeech|Yes ([Tacotron2](https://github.com/NVIDIA/tacotron2))|
-|LJ_FT_T2_V3|V3|LJSpeech|Yes ([Tacotron2](https://github.com/NVIDIA/tacotron2))|
-|VCTK_V1|V1|VCTK|No|
-|VCTK_V2|V2|VCTK|No|
-|VCTK_V3|V3|VCTK|No|
-|UNIVERSAL_V1|V1|Universal|No|
+**Initialize** -  This function is executed during the cold start and is used to initialize the model. If you have any custom configurations or settings that need to be applied during the initialization, make sure to add them in this function.
 
-We provide the universal model with discriminator weights that can be used as a base for transfer learning to other datasets.
+**Infer** - This function is where the inference happens. The argument to this function `inputs`, is a dictionary containing all the input parameters. The keys are the same as the name given in inputs. Refer to [input](#input) for more.
 
-## Fine-Tuning
-1. Generate mel-spectrograms in numpy format using [Tacotron2](https://github.com/NVIDIA/tacotron2) with teacher-forcing.<br/>
-The file name of the generated mel-spectrogram should match the audio file and the extension should be `.npy`.<br/>
-Example:
-    ```
-    Audio File : LJ001-0001.wav
-    Mel-Spectrogram File : LJ001-0001.npy
-    ```
-2. Create `ft_dataset` folder and copy the generated mel-spectrogram files into it.<br/>
-3. Run the following command.
-    ```
-    python train.py --fine_tuning True --config config_v1.json
-    ```
-    For other command line options, please refer to the training section.
+```python
+def infer(self, inputs):
+    prompt = inputs["prompt"]
+```
+
+**Finalize** - This function is used to perform any cleanup activity for example you can unload the model from the gpu by setting `self.pipe = None`.
 
 
-## Inference from wav file
-1. Make `test_files` directory and copy wav files into the directory.
-2. Run the following command.
-    ```
-    python inference.py --checkpoint_file [generator checkpoint file path]
-    ```
-Generated wav files are saved in `generated_files` by default.<br>
-You can change the path by adding `--output_dir` option.
-
-
-## Inference for end-to-end speech synthesis
-1. Make `test_mel_files` directory and copy generated mel-spectrogram files into the directory.<br>
-You can generate mel-spectrograms using [Tacotron2](https://github.com/NVIDIA/tacotron2), 
-[Glow-TTS](https://github.com/jaywalnut310/glow-tts) and so forth.
-2. Run the following command.
-    ```
-    python inference_e2e.py --checkpoint_file [generator checkpoint file path]
-    ```
-Generated wav files are saved in `generated_files_from_mel` by default.<br>
-You can change the path by adding `--output_dir` option.
-
-
-## Acknowledgements
-We referred to [WaveGlow](https://github.com/NVIDIA/waveglow), [MelGAN](https://github.com/descriptinc/melgan-neurips) 
-and [Tacotron2](https://github.com/NVIDIA/tacotron2) to implement this.
-
+For more information refer to the [Inferless docs](https://docs.inferless.com/).
