@@ -72,6 +72,7 @@ def initialize_helper(
     print("Initializing Inference Process..")
 
     config_file = os.path.join(os.path.split(checkpoint_file)[0], "config.json")
+    print("The String: " + str(os.path.abspath(checkpoint_file)))
     with open(config_file) as f:
         data = f.read()
 
