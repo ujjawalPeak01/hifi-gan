@@ -1,0 +1,16 @@
+build:
+  cuda_version: "11.8.0"
+  system_packages:
+    - "libssl-dev"
+    - "tesseract-ocr"
+    - "libtesseract-dev"
+    - "ffmpeg"
+  python_packages:
+    - "torch==1.4.0"
+    - "numpy==1.17.4"
+    - "numba==0.48"
+    - "librosa==0.7.2"
+    - "scipy==1.4.1"
+    - "tensorboard==2.0"
+    - "soundfile==0.10.3.post1"
+    - "matplotlib==3.1.3"

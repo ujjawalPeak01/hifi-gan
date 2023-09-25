@@ -10,4 +10,4 @@ RUN pip install  --no-cache-dir  -r requirements.txt
 
 COPY . .
 
-CMD python3 inference.py --checkpoint_file generator_v3
+CMD python3 app.py

@@ -23,14 +23,16 @@ def load_checkpoint(filepath, device):
 
 
 def get_mel(x):
-    return mel_spectrogram(x, h.n_fft, h.num_mels, h.sampling_rate, h.hop_size, h.win_size, h.fmin, h.fmax)
+    return mel_spectrogram(
+        x, h.n_fft, h.num_mels, h.sampling_rate, h.hop_size, h.win_size, h.fmin, h.fmax
+    )
 
 
 def scan_checkpoint(cp_dir, prefix):
-    pattern = os.path.join(cp_dir, prefix + '*')
+    pattern = os.path.join(cp_dir, prefix + "*")
     cp_list = glob.glob(pattern)
     if len(cp_list) == 0:
-        return ''
+        return ""
     return sorted(cp_list)[-1]
 
 
@@ -38,7 +40,7 @@ def inference(checkpoint_file, input_wavs_dir, output_dir):
     generator = Generator(h).to(device)
 
     state_dict_g = load_checkpoint(checkpoint_file, device)
-    generator.load_state_dict(state_dict_g['generator'])
+    generator.load_state_dict(state_dict_g["generator"])
 
     filelist = os.listdir(input_wavs_dir)
 
@@ -55,16 +57,21 @@ def inference(checkpoint_file, input_wavs_dir, output_dir):
             y_g_hat = generator(x)
             audio = y_g_hat.squeeze()
             audio = audio * MAX_WAV_VALUE
-            audio = audio.cpu().numpy().astype('int16')
+            audio = audio.cpu().numpy().astype("int16")
 
-            output_file = os.path.join(output_dir, os.path.splitext(filname)[0] + '_generated.wav')
+            output_file = os.path.join(
+                output_dir, os.path.splitext(filname)[0] + "_generated.wav"
+            )
             write(output_file, h.sampling_rate, audio)
             print(output_file)
 
-def initialize_helper(checkpoint_file, input_wavs_dir='test_files', output_dir='generated_files'):
-    print('Initializing Inference Process..')
 
-    config_file = os.path.join(os.path.split(checkpoint_file)[0], 'config.json')
+def initialize_helper(
+    checkpoint_file, input_wavs_dir="test_files", output_dir="generated_files"
+):
+    print("Initializing Inference Process..")
+
+    config_file = os.path.join(os.path.split(checkpoint_file)[0], "config.json")
     with open(config_file) as f:
         data = f.read()
 
@@ -76,14 +83,10 @@ def initialize_helper(checkpoint_file, input_wavs_dir='test_files', output_dir='
     global device
     if torch.cuda.is_available():
         torch.cuda.manual_seed(h.seed)
-        device = torch.device('cuda')
+        device = torch.device("cuda")
     else:
-        device = torch.device('cpu')
+        device = torch.device("cpu")
 
 
-if __name__ == '__main__':
-    initialize_helper('generator_v3')
-    inference('generator_v3', 'test_files', 'generated_files')
-    import time
-    time.sleep(50)
-
+if __name__ == "__main__":
+    initialize_helper("model_weights/generator_v3")
