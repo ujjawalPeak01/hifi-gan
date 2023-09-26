@@ -45,7 +45,7 @@ The following is a sample Input and Output JSON for this model which you can use
   "inputs": [
     {
       "data": [
-        "https://infer-global-models.s3.amazonaws.com/ujjawal/ss_gt_1.wav"
+        "https://inferless-public.s3.amazonaws.com/ss_gt_1.wav"
       ],
       "name": "audio_url",
       "shape": [
