@@ -63,9 +63,9 @@ The following is a sample Input and Output JSON for this model which you can use
   "outputs": [
     {
       "data": [
-        "Once upon a time the sun was up he would look down to the valley below and wonder wis"
+        "data"
       ],
-      "name": "generated_text",
+      "name": "generated_base_64",
       "shape": [
         1
       ],
