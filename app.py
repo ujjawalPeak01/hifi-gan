@@ -16,8 +16,11 @@ class InferlessPythonModel:
             self.model_weights_file_name = "generator_v3"
             self.config_file_name = "config.json"
             self.location = volume_location
+
+            model_weights_path = os.path.join(volume_location, self.model_weights_file_name)
+            config_file_path = os.path.join(volume_location, self.config_file_name)
             
-            if not os.path.exists(os.path.join(volume_location, self.model_weights_file_name)):
+            if not os.path.exists(model_weights_path) or not os.path.exists(config_file_path):
                 src = os.path.join(current_dir_location, self.model_weights_file_name)
                 src_config = os.path.join(current_dir_location, self.config_file_name)
                 dst = volume_location
