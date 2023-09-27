@@ -11,7 +11,7 @@ from inference import initialize_helper, inference
 
 class InferlessPythonModel:
     def initialize(self):
-            volume_location = '/var/nfs-mount/volume'
+            volume_location = '/var/nfs-mount/new-vol'
             current_dir_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
             self.model_weights_file_name = "generator_v3"
             self.config_file_name = "config.json"
