@@ -1,6 +1,7 @@
 import os
 import base64
 import torch
+import shutil
 import requests
 import soundfile as sf
 from io import BytesIO
@@ -10,9 +11,22 @@ from inference import initialize_helper, inference
 
 class InferlessPythonModel:
     def initialize(self):
-        self.location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        self.model_weights_file_name = "generator_v3"
-        initialize_helper(os.path.join(self.location, self.model_weights_file_name))
+            volume_location = '/var/nfs-mount/volume'
+            current_dir_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+            self.model_weights_file_name = "generator_v3"
+            self.config_file_name = "config.json"
+            self.location = None
+            
+            if not os.path.exists(os.path.join(volume_location, self.model_weights_file_name)):
+                src = os.path.join(current_dir_location, self.model_weights_file_name)
+                src_config = os.path.join(current_dir_location, self.config_file_name)
+                dst = volume_location
+    
+                shutil.move(src, dst)
+                shutil.move(src_config, dst)
+                self.location = volume_location
+            
+            initialize_helper(os.path.join(self.location, self.model_weights_file_name))
 
     def dowload_wav_file(self, audio_url):
         response = requests.get(audio_url)
