@@ -15,7 +15,7 @@ class InferlessPythonModel:
             current_dir_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
             self.model_weights_file_name = "generator_v3"
             self.config_file_name = "config.json"
-            self.location = None
+            self.location = volume_location
             
             if not os.path.exists(os.path.join(volume_location, self.model_weights_file_name)):
                 src = os.path.join(current_dir_location, self.model_weights_file_name)
@@ -24,7 +24,6 @@ class InferlessPythonModel:
     
                 shutil.move(src, dst)
                 shutil.move(src_config, dst)
-                self.location = volume_location
             
             initialize_helper(os.path.join(self.location, self.model_weights_file_name))
 
