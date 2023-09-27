@@ -22,8 +22,8 @@ class InferlessPythonModel:
                 src_config = os.path.join(current_dir_location, self.config_file_name)
                 dst = volume_location
     
-                shutil.move(src, dst)
-                shutil.move(src_config, dst)
+                shutil.copy(src, dst)
+                shutil.copy(src_config, dst)
             
             initialize_helper(os.path.join(self.location, self.model_weights_file_name))
 
